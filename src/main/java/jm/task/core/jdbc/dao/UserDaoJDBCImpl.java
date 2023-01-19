@@ -38,70 +38,26 @@ public class UserDaoJDBCImpl implements UserDao {
     }
 
     public void saveUser(String name, String lastName, byte age) {
-        Connection connection = null;
-        PreparedStatement preparedStatement = null;
-        try {
-            connection = Util.getConnection();
-            preparedStatement = connection.prepareStatement(SAVE_USER);
+        try (Connection connection = Util.getConnection()) {
+            PreparedStatement preparedStatement = connection.prepareStatement(SAVE_USER);
             preparedStatement.setString(1, name);
             preparedStatement.setString(2, lastName);
             preparedStatement.setByte(3, age);
             preparedStatement.executeUpdate();
             connection.commit();
         } catch (SQLException e) {
-            try {
-                connection.rollback();
-            } catch (SQLException e1) {
-                System.err.println(e1);
-            }
             System.err.println(e);
-        }
-        finally {
-            if (preparedStatement != null)
-                try {
-                preparedStatement.close();
-                } catch (SQLException e) {
-                    System.err.println(e);
-            }
-            if (connection != null)
-                try {
-                connection.close();
-                } catch (SQLException e) {
-                    System.err.println(e);
-            }
         }
     }
 
     public void removeUserById(long id) {
-        Connection connection = null;
-        PreparedStatement preparedStatement = null;
-        try {
-            connection = Util.getConnection();
-            preparedStatement = connection.prepareStatement(REMOVE_USER);
+        try (Connection connection = Util.getConnection()) {
+            PreparedStatement preparedStatement = connection.prepareStatement(REMOVE_USER);
             preparedStatement.setLong(1, id);
             preparedStatement.executeUpdate();
             connection.commit();
         } catch (SQLException e) {
-            try {
-                connection.rollback();
-            } catch (SQLException e1) {
-                System.err.println(e1);
-            }
             System.err.println(e);
-        }
-        finally {
-            if (preparedStatement != null)
-                try {
-                    preparedStatement.close();
-                } catch (SQLException e) {
-                    System.err.println(e);
-                }
-            if (connection != null)
-                try {
-                    connection.close();
-                } catch (SQLException e) {
-                    System.err.println(e);
-                }
         }
     }
 
