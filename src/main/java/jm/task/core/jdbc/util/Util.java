@@ -10,7 +10,8 @@ public class Util {
     private static final String PASSWORD = "dragonfly";
 
     public static Connection getConnection() throws SQLException {
-        Connection connection = null;
-        return connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+        Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+        connection.setAutoCommit(false);
+        return connection;
     }
 }

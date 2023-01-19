@@ -22,6 +22,7 @@ public class UserDaoJDBCImpl implements UserDao {
     public void createUsersTable() {
         try (Connection connection = Util.getConnection()) {
             connection.createStatement().execute(CREATE_TABLE);
+            connection.commit();
         } catch (SQLException e) {
             System.err.println("SQLException");
         }
@@ -30,30 +31,77 @@ public class UserDaoJDBCImpl implements UserDao {
     public void dropUsersTable() {
         try (Connection connection = Util.getConnection()) {
             connection.createStatement().execute(DROP_TABLE);
+            connection.commit();
         } catch (SQLException e) {
             System.err.println("SQLException");
         }
     }
 
     public void saveUser(String name, String lastName, byte age) {
-        try (Connection connection = Util.getConnection()) {
-            PreparedStatement preparedStatement = connection.prepareStatement(SAVE_USER);
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        try {
+            connection = Util.getConnection();
+            preparedStatement = connection.prepareStatement(SAVE_USER);
             preparedStatement.setString(1, name);
             preparedStatement.setString(2, lastName);
             preparedStatement.setByte(3, age);
             preparedStatement.executeUpdate();
+            connection.commit();
         } catch (SQLException e) {
-            System.err.println("SQLException");
+            try {
+                connection.rollback();
+            } catch (SQLException e1) {
+                System.err.println(e1);
+            }
+            System.err.println(e);
+        }
+        finally {
+            if (preparedStatement != null)
+                try {
+                preparedStatement.close();
+                } catch (SQLException e) {
+                    System.err.println(e);
+            }
+            if (connection != null)
+                try {
+                connection.close();
+                } catch (SQLException e) {
+                    System.err.println(e);
+            }
         }
     }
 
     public void removeUserById(long id) {
-        try (Connection connection = Util.getConnection()) {
-            PreparedStatement preparedStatement = connection.prepareStatement(REMOVE_USER);
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        try {
+            connection = Util.getConnection();
+            preparedStatement = connection.prepareStatement(REMOVE_USER);
             preparedStatement.setLong(1, id);
             preparedStatement.executeUpdate();
+            connection.commit();
         } catch (SQLException e) {
-            System.err.println("SQLException");
+            try {
+                connection.rollback();
+            } catch (SQLException e1) {
+                System.err.println(e1);
+            }
+            System.err.println(e);
+        }
+        finally {
+            if (preparedStatement != null)
+                try {
+                    preparedStatement.close();
+                } catch (SQLException e) {
+                    System.err.println(e);
+                }
+            if (connection != null)
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                    System.err.println(e);
+                }
         }
     }
 
@@ -79,6 +127,7 @@ public class UserDaoJDBCImpl implements UserDao {
     public void cleanUsersTable() {
         try (Connection connection = Util.getConnection()) {
             connection.createStatement().execute(CLEAN_TABLE);
+            connection.commit();
         } catch (SQLException e) {
             System.err.println("SQLException");
         }
